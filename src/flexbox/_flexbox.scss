@@ -1,0 +1,194 @@
+//-- Flexbox
+@use "../config";
+
+$flexbox-grids-count: 12 !default;
+$flexbox-gap-default: 1em !default;
+$flexbox-grid-selector: unquote("grid-") !default;
+$flexbox-col-selector: unquote("col-") !default;
+
+@mixin safariOnly {
+  @media not all and (min-resolution: .001dpcm) {
+    @content;
+  }
+}
+
+$sel: config.prefix("flex");
+.#{$sel} {
+  display: flex;
+
+  &.inline {
+    display: inline-flex;
+  }
+
+  &.fullsize {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  &.column {
+    flex-direction: column;
+    &.reverse {
+      flex-direction: column-reverse;
+    }
+  }
+
+  &.reverse {
+    flex-direction: row-reverse;
+  }
+
+  &.wrap {
+    flex-wrap: wrap;
+    &-reverse {
+      flex-wrap: wrap-reverse;
+    }
+  }
+
+  &.auto {
+    > * {
+      flex: 1 1 0%;
+    }
+  }
+
+  &.center {
+    > * {
+      margin: auto;
+    }
+  }
+
+  $flex: flex-start flex-end center;
+  $space: space-around space-between;
+  $stretch: stretch;
+  $justifyContent: join($flex, space-around space-between);
+  $alignContent: join($justifyContent, $stretch);
+  $alignItems: join($flex, $stretch baseline);
+
+  // align items in x-axis for flex=row (default) and in y-axis when flex=column mode
+  @each $mod in $justifyContent {
+    &.justify-#{$mod} {
+      justify-content: $mod;
+    }
+  }
+
+  // opposite to .justify-*, but has a bit different values
+  @each $mod in $alignItems {
+    &.align-#{$mod} {
+      align-items: $mod;
+    }
+  }
+  @each $mod in $alignContent {
+    &.content-#{$mod} {
+      align-content: $mod;
+    }
+  }
+
+  // gaps
+  &.gaps {
+    $gap: var(--flex-gap, #{$flexbox-gap-default});
+    &.column {
+      &:not(.reverse) > :not(:last-child) {
+        margin-bottom: $gap;
+      }
+      &.reverse > :not(:last-child) {
+        margin-top: $gap;
+      }
+    }
+    &:not(.column) {
+      &:not(.reverse) > :not(:last-child) {
+        margin-right: $gap;
+      }
+      &.reverse > :not(:last-child) {
+        margin-left: $gap;
+      }
+    }
+  }
+
+  // children
+  > .box {
+    &.first {
+      order: -1;
+    }
+    &.last {
+      order: 1;
+    }
+    &.grow {
+      flex: 1 0;
+      &-fixed {
+        flex: 1 0 0;
+        @include safariOnly {
+          flex-basis: 0%;
+        }
+      }
+    }
+    &.nogrow {
+      flex-grow: 0;
+      flex-basis: auto;
+    }
+    &.noshrink {
+      flex-shrink: 0;
+    }
+    &.center {
+      margin: auto;
+    }
+    &.left {
+      margin-left: 0;
+      margin-right: auto;
+    }
+    &.right {
+      margin-right: 0;
+      margin-left: auto;
+    }
+    &.top {
+      margin-top: 0;
+      margin-bottom: auto;
+    }
+    &.bottom {
+      margin-bottom: 0;
+      margin-top: auto;
+    }
+
+    @each $mod in $alignItems {
+      &.self-#{$mod} {
+        align-self: $mod;
+      }
+    }
+  }
+
+  // generate grids & columns for browsers with css-variables support
+  $grid: 1;
+  $grids: ();
+  $cols: ();
+
+  @while $grid <= $flexbox-grids-count {
+    &.#{$flexbox-grid-selector}#{$grid} > * {
+      --flex-grid: #{$grid};
+    }
+    .#{$flexbox-col-selector}#{$grid} {
+      --flex-col: #{$grid};
+    }
+    $grids: append($grids, #{& +"."+ $flexbox-grid-selector + $grid}, "comma");
+    $cols: append($cols, #{& +" > ."+ $flexbox-col-selector + $grid}, "comma");
+    $grid: $grid + 1;
+  }
+
+  // default grid size for every .flex container is 12
+  --flex-grid: #{$flexbox-grids-count};
+
+  @at-root {
+    #{$grids} {
+      > * {
+        // default column size for any grid is 1
+        flex: 0 4 calc(100% / var(--flex-grid));
+      }
+    }
+    #{$cols} {
+      flex: 0 1 calc(100% / var(--flex-grid) * var(--flex-col));
+    }
+  }
+
+  // firefox fix: don't allow to flex-children go beyond its flex container
+  > {
+    input, textarea {
+      min-width: 0;
+    }
+  }
+}

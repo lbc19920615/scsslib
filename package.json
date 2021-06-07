@@ -1,0 +1,16 @@
+{
+  "name": "scsslib",
+  "version": "0.2.0",
+  "description": "",
+  "main": "",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "style": "yarn postsass --dir example"
+  },
+  "author": "lbc",
+  "license": "MIT",
+  "devDependencies": {
+  }
+}

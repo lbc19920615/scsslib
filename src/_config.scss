@@ -1,0 +1,6 @@
+$lib-prefix: 'ui';
+$lib-flexbox-prefix: $lib-prefix;
+
+@function prefix($sel) {
+    @return $lib-flexbox-prefix + '-' +$sel
+}

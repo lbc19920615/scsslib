@@ -1,10 +1,12 @@
 @use "sass:meta";
 @use "sass:map";
 
+///
 $lib: (
     prefix: ''
 );
 
+///
 @function set-env($args...) {
     @each $key, $value in meta.keywords($args) {
         $lib: map.set($lib, $key, $value) !global;
@@ -12,6 +14,7 @@ $lib: (
     @return $lib;
 }
 
+///
 @function prefix($sel) {
     $lib-flexbox-prefix: map-get($lib, 'prefix');
     @return $lib-flexbox-prefix + '-' +$sel

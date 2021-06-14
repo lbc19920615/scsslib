@@ -1,5 +1,17 @@
-@use "../src/flexbox/flexbox";
+@use '../src/config' as config;
+@use "sass:meta";
+@use "../modules/flexbox/flexbox";
+
+$my-config: config.set-env(
+    $prefix: "ui",
+);
+
+@include flexbox.module-flexbox-init(
+    meta.get-function('prefix', $module: 'config')
+);
 
 body {
     background-color: aqua;
 }
+
+
